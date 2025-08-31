@@ -14,13 +14,189 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      announcements: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          class_level: number
+          course_code: string
+          course_name: string
+          created_at: string
+          day_of_week: string
+          end_time: string
+          id: string
+          instructor: string
+          room: string | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          class_level: number
+          course_code: string
+          course_name: string
+          created_at?: string
+          day_of_week: string
+          end_time: string
+          id?: string
+          instructor: string
+          room?: string | null
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          class_level?: number
+          course_code?: string
+          course_name?: string
+          created_at?: string
+          day_of_week?: string
+          end_time?: string
+          id?: string
+          instructor?: string
+          room?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      faculty_members: {
+        Row: {
+          created_at: string
+          department: string
+          email: string | null
+          id: string
+          image_url: string | null
+          name: string
+          office: string | null
+          phone: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          office?: string | null
+          phone?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          office?: string | null
+          phone?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      surveys: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          questions: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          questions: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          questions?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
