@@ -7,10 +7,12 @@ import {
   Calendar, 
   Users, 
   ClipboardList,
-  BarChart3 
+  BarChart3,
+  Home
 } from 'lucide-react';
 
 const navigationItems = [
+  { id: 'home', label: 'Ana Sayfa', icon: Home, path: '/' },
   { id: 'photo', label: 'Hatıra Fotoğrafı', icon: Camera, path: '/photo' },
   { id: 'announcements', label: 'Duyurular', icon: Megaphone, path: '/announcements' },
   { id: 'map', label: 'Harita', icon: Map, path: '/map' },
@@ -25,7 +27,7 @@ export const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
-      <div className="grid grid-cols-6 gap-1 p-2">
+      <div className="grid grid-cols-7 gap-1 p-2">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
