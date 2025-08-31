@@ -10,7 +10,8 @@ import {
   ClipboardList,
   GraduationCap,
   Clock,
-  MapPin
+  MapPin,
+  Settings
 } from 'lucide-react';
 
 const quickActions = [
@@ -137,6 +138,18 @@ export default function HomePage() {
             </Card>
           </div>
         </section>
+      </div>
+      
+      {/* Admin Panel Access Button */}
+      <div className="fixed bottom-4 right-4">
+        <Button
+          onClick={() => navigate("/admin-login")}
+          variant="outline"
+          size="sm"
+          className="opacity-60 hover:opacity-100 transition-opacity"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
