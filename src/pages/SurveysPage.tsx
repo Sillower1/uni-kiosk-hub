@@ -108,7 +108,10 @@ const SurveysPage = () => {
                   
                   {!isExpired(survey.expires_at) && (
                     <div className="pt-4">
-                      <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors">
+                      <button 
+                        onClick={() => window.location.href = `/surveys/${survey.id}`}
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors"
+                      >
                         Anketi Görüntüle
                       </button>
                     </div>

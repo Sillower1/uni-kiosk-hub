@@ -11,6 +11,7 @@ import MapPage from "./pages/MapPage";
 import SchedulePage from "./pages/SchedulePage";
 import FacultyPage from "./pages/FacultyPage";
 import SurveysPage from "./pages/SurveysPage";
+import SurveyDetailPage from "./pages/SurveyDetailPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/faculty" element={<FacultyPage />} />
             <Route path="/surveys" element={<SurveysPage />} />
+            <Route path="/surveys/:id" element={<SurveyDetailPage />} />
             <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
