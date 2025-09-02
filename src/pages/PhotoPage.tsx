@@ -85,7 +85,11 @@ export default function PhotoPage() {
         context.scale(-1, 1);
       }
 
+      // Önce video görüntüsünü çiz
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Çerçeveyi uygula
+      drawFrame(context, canvas.width, canvas.height);
 
       const photoDataUrl = canvas.toDataURL('image/png');
       setPreviewImage(photoDataUrl);
@@ -98,6 +102,51 @@ export default function PhotoPage() {
         setCameraActive(false);
       }
     }
+  };
+
+  const drawFrame = (context: CanvasRenderingContext2D, width: number, height: number) => {
+    const frame = photoFrames[currentFrame];
+    const borderWidth = 20; // Çerçeve kalınlığı
+    
+    context.strokeStyle = '#3B82F6'; // Primary color (blue)
+    context.lineWidth = borderWidth;
+    
+    // Çerçeve türüne göre çiz
+    switch (frame.id) {
+      case 1: // DEÜ Klasik - Kalın çerçeve
+        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
+        break;
+      case 2: // Modern - Rounded çerçeve
+        drawRoundedRect(context, borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth, 20);
+        break;
+      case 3: // Mezuniyet - Gradient çerçeve
+        const gradient = context.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, '#3B82F6');
+        gradient.addColorStop(1, '#8B5CF6');
+        context.strokeStyle = gradient;
+        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
+        break;
+      case 4: // YBS Özel - Çift çerçeve
+        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
+        context.lineWidth = borderWidth/2;
+        context.strokeRect(borderWidth*1.5, borderWidth*1.5, width - borderWidth*3, height - borderWidth*3);
+        break;
+    }
+  };
+
+  const drawRoundedRect = (context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    context.lineTo(x + width, y + height - radius);
+    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    context.lineTo(x + radius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    context.lineTo(x, y + radius);
+    context.quadraticCurveTo(x, y, x + radius, y);
+    context.closePath();
+    context.stroke();
   };
 
   const resetPhoto = () => {
