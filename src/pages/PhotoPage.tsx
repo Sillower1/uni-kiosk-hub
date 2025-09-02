@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Camera, Download, Share2 } from 'lucide-react';
@@ -17,6 +17,8 @@ export default function PhotoPage() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
+  const [isMirrored, setIsMirrored] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const nextFrame = () => {
     setCurrentFrame((prev) => (prev + 1) % photoFrames.length);
@@ -28,39 +30,66 @@ export default function PhotoPage() {
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' } 
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
       });
       setStream(mediaStream);
       setCameraActive(true);
-      
-      const video = document.getElementById('camera-video') as HTMLVideoElement;
-      if (video) {
-        video.srcObject = mediaStream;
-      }
     } catch (error) {
       console.error('Kamera erişimi başarısız:', error);
       alert('Kamera erişimi için izin gerekli');
     }
   };
 
+  // Kamerayı video elementine bağla ve oynat
+  useEffect(() => {
+    const video = videoRef.current;
+    if (cameraActive && stream && video) {
+      try {
+        //
+        video.srcObject = stream;
+        const playPromise = video.play();
+        if (playPromise && typeof (playPromise as any).catch === 'function') {
+          (playPromise as Promise<void>).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('Video oynatma başlatılamadı');
+      }
+    }
+  }, [cameraActive, stream]);
+
+  // Bileşen kapandığında kamerayı kapat
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, [stream]);
+
   const takePhoto = () => {
-    const video = document.getElementById('camera-video') as HTMLVideoElement;
+    const video = videoRef.current;
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    
+
     if (video && context) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0);
-      
+      canvas.width = video.videoWidth || video.clientWidth;
+      canvas.height = video.videoHeight || video.clientHeight;
+
+      if (isMirrored) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+      }
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
       const photoDataUrl = canvas.toDataURL('image/png');
       setPreviewImage(photoDataUrl);
       setPhotoTaken(true);
-      
-      // Stop camera
+
+      // Kamerayı kapat
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
         setStream(null);
         setCameraActive(false);
       }
@@ -106,9 +135,11 @@ export default function PhotoPage() {
               <div className={cn("w-full h-full relative", photoFrames[currentFrame].style)}>
                 <video
                   id="camera-video"
+                  ref={videoRef}
                   autoPlay
                   playsInline
-                  className="w-full h-full object-cover rounded-lg"
+                  muted
+                  className={cn("w-full h-full object-cover rounded-lg", isMirrored && "scale-x-[-1]")}
                 />
                 <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
                   {photoFrames[currentFrame].name}
@@ -183,14 +214,24 @@ export default function PhotoPage() {
                   Kamerayı Aç
                 </Button>
               ) : (
-                <Button
-                  onClick={takePhoto}
-                  size="lg"
-                  className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
-                >
-                  <Camera className="w-8 h-8 mr-3" />
-                  Fotoğraf Çek
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={takePhoto}
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
+                  >
+                    <Camera className="w-8 h-8 mr-3" />
+                    Fotoğraf Çek
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setIsMirrored((v) => !v)}
+                    className="text-lg px-6 py-6"
+                  >
+                    {isMirrored ? 'Aynalamayı Kapat' : 'Aynala'}
+                  </Button>
+                </div>
               )
             ) : (
               <>
