@@ -25,7 +25,7 @@ const FacultyPage = () => {
     try {
       // Use the security function to get only public faculty information
       const { data, error } = await supabase
-        .rpc("get_public_faculty_members");
+        .rpc("get_public_faculty_members") as { data: FacultyMember[] | null, error: any };
 
       if (error) throw error;
       setFacultyMembers(data || []);

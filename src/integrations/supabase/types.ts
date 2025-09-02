@@ -223,6 +223,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_faculty_members: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          department: string
+          id: string
+          image_url: string
+          name: string
+          office: string
+          title: string
+          updated_at: string
+        }[]
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
