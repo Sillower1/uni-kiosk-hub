@@ -5,16 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ChevronLeft, ChevronRight, Camera, Download, Share2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import QRCode from 'react-qr-code';
+import { supabase } from '@/integrations/supabase/client';
 
-const photoFrames = [
-  { id: 1, name: 'DEÜ Klasik', preview: '/placeholder.svg', style: 'border-8 border-primary' },
-  { id: 2, name: 'Modern', preview: '/placeholder.svg', style: 'border-4 border-accent rounded-2xl' },
-  { id: 3, name: 'Mezuniyet', preview: '/placeholder.svg', style: 'border-6 border-gradient-to-r from-accent to-primary rounded-lg' },
-  { id: 4, name: 'YBS Özel', preview: '/placeholder.svg', style: 'border-8 border-double border-primary' },
-];
+interface PhotoFrame {
+  id: string;
+  name: string;
+  image_url: string;
+  display_order: number;
+}
 
 export default function PhotoPage() {
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [photoFrames, setPhotoFrames] = useState<PhotoFrame[]>([]);
   const [photoTaken, setPhotoTaken] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -23,6 +25,25 @@ export default function PhotoPage() {
   const [showQR, setShowQR] = useState(false);
   const [shareableImageUrl, setShareableImageUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    fetchFrames();
+  }, []);
+
+  const fetchFrames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('frames')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setPhotoFrames(data || []);
+    } catch (error) {
+      console.error('Error fetching frames:', error);
+    }
+  };
 
   const nextFrame = () => {
     setCurrentFrame((prev) => (prev + 1) % photoFrames.length);
@@ -71,12 +92,12 @@ export default function PhotoPage() {
     };
   }, [stream]);
 
-  const takePhoto = () => {
+  const takePhoto = async () => {
     const video = videoRef.current;
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
-    if (video && context) {
+    if (video && context && photoFrames.length > 0) {
       canvas.width = video.videoWidth || video.clientWidth;
       canvas.height = video.videoHeight || video.clientHeight;
 
@@ -88,8 +109,8 @@ export default function PhotoPage() {
       // Önce video görüntüsünü çiz
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Çerçeveyi uygula
-      drawFrame(context, canvas.width, canvas.height);
+      // Çerçeveyi PNG olarak overlay et
+      await applyFrameOverlay(context, canvas.width, canvas.height);
 
       const photoDataUrl = canvas.toDataURL('image/png');
       setPreviewImage(photoDataUrl);
@@ -104,49 +125,27 @@ export default function PhotoPage() {
     }
   };
 
-  const drawFrame = (context: CanvasRenderingContext2D, width: number, height: number) => {
-    const frame = photoFrames[currentFrame];
-    const borderWidth = 20; // Çerçeve kalınlığı
-    
-    context.strokeStyle = '#3B82F6'; // Primary color (blue)
-    context.lineWidth = borderWidth;
-    
-    // Çerçeve türüne göre çiz
-    switch (frame.id) {
-      case 1: // DEÜ Klasik - Kalın çerçeve
-        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
-        break;
-      case 2: // Modern - Rounded çerçeve
-        drawRoundedRect(context, borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth, 20);
-        break;
-      case 3: // Mezuniyet - Gradient çerçeve
-        const gradient = context.createLinearGradient(0, 0, width, height);
-        gradient.addColorStop(0, '#3B82F6');
-        gradient.addColorStop(1, '#8B5CF6');
-        context.strokeStyle = gradient;
-        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
-        break;
-      case 4: // YBS Özel - Çift çerçeve
-        context.strokeRect(borderWidth/2, borderWidth/2, width - borderWidth, height - borderWidth);
-        context.lineWidth = borderWidth/2;
-        context.strokeRect(borderWidth*1.5, borderWidth*1.5, width - borderWidth*3, height - borderWidth*3);
-        break;
-    }
-  };
+  const applyFrameOverlay = (context: CanvasRenderingContext2D, width: number, height: number): Promise<void> => {
+    return new Promise((resolve) => {
+      const currentFrameData = photoFrames[currentFrame];
+      if (!currentFrameData) {
+        resolve();
+        return;
+      }
 
-  const drawRoundedRect = (context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
-    context.beginPath();
-    context.moveTo(x + radius, y);
-    context.lineTo(x + width - radius, y);
-    context.quadraticCurveTo(x + width, y, x + width, y + radius);
-    context.lineTo(x + width, y + height - radius);
-    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    context.lineTo(x + radius, y + height);
-    context.quadraticCurveTo(x, y + height, x, y + height - radius);
-    context.lineTo(x, y + radius);
-    context.quadraticCurveTo(x, y, x + radius, y);
-    context.closePath();
-    context.stroke();
+      const frameImage = new Image();
+      frameImage.crossOrigin = 'anonymous';
+      frameImage.onload = () => {
+        // Çerçeve resmini video boyutlarına uyacak şekilde çiz
+        context.drawImage(frameImage, 0, 0, width, height);
+        resolve();
+      };
+      frameImage.onerror = () => {
+        console.error('Frame image failed to load');
+        resolve();
+      };
+      frameImage.src = currentFrameData.image_url;
+    });
   };
 
   const resetPhoto = () => {
@@ -172,10 +171,10 @@ export default function PhotoPage() {
   };
 
   const sharePhoto = () => {
-    if (previewImage) {
+    if (previewImage && photoFrames.length > 0) {
       // Paylaşılabilir URL oluştur (base64'ü encode et)
       const encodedImage = encodeURIComponent(previewImage);
-      const shareUrl = `${window.location.origin}/shared-photo?img=${encodedImage}&frame=${photoFrames[currentFrame].name}`;
+      const shareUrl = `${window.location.origin}/shared-photo?img=${encodedImage}&frame=${photoFrames[currentFrame]?.name || 'DEÜ Klasik'}`;
       setShareableImageUrl(shareUrl);
       setShowQR(true);
     }
@@ -196,18 +195,18 @@ export default function PhotoPage() {
         <Card className="mb-8 p-8 bg-gradient-to-br from-card to-secondary/10 shadow-lg">
           <div className="aspect-[4/3] max-w-2xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-2xl border-4 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
-              <div className={cn("w-full h-full relative", photoFrames[currentFrame].style)}>
+              <div className="w-full h-full relative">
                 <img 
                   src={previewImage} 
                   alt="Preview" 
                   className="w-full h-full object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
-                  {photoFrames[currentFrame].name}
+                  {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
               </div>
             ) : cameraActive ? (
-              <div className={cn("w-full h-full relative", photoFrames[currentFrame].style)}>
+              <div className="w-full h-full relative">
                 <video
                   id="camera-video"
                   ref={videoRef}
@@ -216,8 +215,17 @@ export default function PhotoPage() {
                   muted
                   className={cn("w-full h-full object-cover rounded-lg", isMirrored && "scale-x-[-1]")}
                 />
+                {photoFrames[currentFrame] && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    <img
+                      src={photoFrames[currentFrame].image_url}
+                      alt="Frame overlay"
+                      className="w-full h-full object-cover rounded-lg opacity-50"
+                    />
+                  </div>
+                )}
                 <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
-                  {photoFrames[currentFrame].name}
+                  {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
               </div>
             ) : (
@@ -227,7 +235,7 @@ export default function PhotoPage() {
                   Fotoğraf Önizleme Alanı
                 </p>
                 <p className="text-lg text-muted-foreground/60 mt-2">
-                  {photoFrames[currentFrame].name} çerçevesi seçili
+                  {photoFrames[currentFrame]?.name || 'Çerçeve seçili'} çerçevesi seçili
                 </p>
               </div>
             )}
@@ -249,7 +257,7 @@ export default function PhotoPage() {
             
             <div className="text-center min-w-[200px]">
               <h3 className="text-2xl font-semibold text-primary mb-2">
-                {photoFrames[currentFrame].name}
+                {photoFrames[currentFrame]?.name || 'Çerçeve Yok'}
               </h3>
               <div className="flex justify-center space-x-2">
                 {photoFrames.map((_, index) => (

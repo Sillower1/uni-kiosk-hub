@@ -125,6 +125,39 @@ export type Database = {
         }
         Relationships: []
       }
+      frames: {
+        Row: {
+          created_at: string
+          created_by: string
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
