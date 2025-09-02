@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface FacultyMember {
   id: string;
   name: string;
   title: string;
   department: string;
-  email?: string;
-  phone?: string;
   office?: string;
   image_url?: string;
 }
@@ -25,10 +23,9 @@ const FacultyPage = () => {
 
   const fetchFacultyMembers = async () => {
     try {
+      // Use the security function to get only public faculty information
       const { data, error } = await supabase
-        .from("faculty_members")
-        .select("*")
-        .order("name");
+        .rpc("get_public_faculty_members");
 
       if (error) throw error;
       setFacultyMembers(data || []);
@@ -78,28 +75,16 @@ const FacultyPage = () => {
                     <span className="font-medium">Bölüm:</span> {member.department}
                   </div>
                   
-                  {member.email && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <a href={`mailto:${member.email}`} className="text-primary hover:underline">
-                        {member.email}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {member.phone && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span>{member.phone}</span>
-                    </div>
-                  )}
-                  
                   {member.office && (
                     <div className="flex items-center gap-2 text-sm">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>{member.office}</span>
+                      <span>Ofis: {member.office}</span>
                     </div>
                   )}
+                  
+                  <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
+                    İletişim bilgileri için bölüm sekreterliğine başvurunuz.
+                  </div>
                 </div>
               </CardContent>
             </Card>
