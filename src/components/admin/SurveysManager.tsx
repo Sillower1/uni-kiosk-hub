@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2, Eye, X } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, X, FileText } from "lucide-react";
+import { SurveyResponsesViewer } from "./SurveyResponsesViewer";
 
 interface Survey {
   id: string;
@@ -26,6 +27,7 @@ export const SurveysManager = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [viewingResponses, setViewingResponses] = useState<Survey | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -387,7 +389,16 @@ export const SurveysManager = () => {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => setViewingResponses(survey)}
+                      title="Cevapları Görüntüle"
+                    >
+                      <FileText className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleEdit(survey)}
+                      title="Düzenle"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -395,6 +406,7 @@ export const SurveysManager = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(survey.id)}
+                      title="Sil"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -405,6 +417,14 @@ export const SurveysManager = () => {
           </TableBody>
         </Table>
       </div>
+
+      {viewingResponses && (
+        <SurveyResponsesViewer
+          survey={viewingResponses}
+          isOpen={!!viewingResponses}
+          onClose={() => setViewingResponses(null)}
+        />
+      )}
     </div>
   );
 };
