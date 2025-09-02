@@ -70,10 +70,10 @@ const SurveyDetailPage = () => {
     }
   };
 
-  const handleResponseChange = (questionId: string, value: string) => {
+  const handleResponseChange = (questionIndex: number, value: string) => {
     setResponses(prev => ({
       ...prev,
-      [questionId]: value
+      [questionIndex]: value
     }));
   };
 
@@ -81,8 +81,9 @@ const SurveyDetailPage = () => {
     if (!survey) return;
 
     // Check required questions
-    const requiredQuestions = survey.questions.filter(q => q.required);
-    const missingResponses = requiredQuestions.filter(q => !responses[q.id] || responses[q.id].trim() === "");
+    const missingResponses = survey.questions
+      .map((q, index) => ({ question: q, index }))
+      .filter(({ question, index }) => question.required && (!responses[index] || responses[index].trim() === ""));
     
     if (missingResponses.length > 0) {
       toast({
@@ -127,21 +128,21 @@ const SurveyDetailPage = () => {
     return new Date(expiresAt) < new Date();
   };
 
-  const renderQuestion = (question: Question) => {
-    const value = responses[question.id] || "";
+  const renderQuestion = (question: Question, questionIndex: number) => {
+    const value = responses[questionIndex] || "";
 
     switch (question.type) {
       case "rating":
         return (
           <RadioGroup 
             value={value} 
-            onValueChange={(value) => handleResponseChange(question.id, value)}
+            onValueChange={(value) => handleResponseChange(questionIndex, value)}
             className="flex space-x-4"
           >
             {[1, 2, 3, 4, 5].map((rating) => (
               <div key={rating} className="flex items-center space-x-2">
-                <RadioGroupItem value={rating.toString()} id={`${question.id}-${rating}`} />
-                <Label htmlFor={`${question.id}-${rating}`}>{rating}</Label>
+                <RadioGroupItem value={rating.toString()} id={`q${questionIndex}-${rating}`} />
+                <Label htmlFor={`q${questionIndex}-${rating}`}>{rating}</Label>
               </div>
             ))}
           </RadioGroup>
@@ -151,13 +152,13 @@ const SurveyDetailPage = () => {
         return (
           <RadioGroup 
             value={value} 
-            onValueChange={(value) => handleResponseChange(question.id, value)}
+            onValueChange={(value) => handleResponseChange(questionIndex, value)}
             className="space-y-2"
           >
-            {question.options?.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`${question.id}-${index}`} />
-                <Label htmlFor={`${question.id}-${index}`}>{option}</Label>
+            {question.options?.map((option, optionIndex) => (
+              <div key={optionIndex} className="flex items-center space-x-2">
+                <RadioGroupItem value={option} id={`q${questionIndex}-${optionIndex}`} />
+                <Label htmlFor={`q${questionIndex}-${optionIndex}`}>{option}</Label>
               </div>
             ))}
           </RadioGroup>
@@ -167,7 +168,7 @@ const SurveyDetailPage = () => {
         return (
           <Textarea
             value={value}
-            onChange={(e) => handleResponseChange(question.id, e.target.value)}
+            onChange={(e) => handleResponseChange(questionIndex, e.target.value)}
             placeholder="Cevabınızı buraya yazın..."
             className="min-h-[100px]"
           />
@@ -235,12 +236,12 @@ const SurveyDetailPage = () => {
         
         <CardContent className="space-y-6">
           {survey.questions.map((question, index) => (
-            <div key={question.id} className="space-y-3">
+            <div key={index} className="space-y-3">
               <Label className="text-base font-medium">
                 {index + 1}. {question.question}
                 {question.required && <span className="text-destructive ml-1">*</span>}
               </Label>
-              {renderQuestion(question)}
+              {renderQuestion(question, index)}
             </div>
           ))}
           

@@ -67,21 +67,21 @@ export const SurveyResponsesViewer = ({ survey, isOpen, onClose }: SurveyRespons
         "Gönderim Tarihi": new Date(response.submitted_at).toLocaleString("tr-TR"),
       };
 
-      // Add question responses
-      if (Array.isArray(survey.questions)) {
-        survey.questions.forEach((question, index) => {
-          const responseValue = response.responses[index];
-          let displayValue = responseValue;
+          // Add question responses
+          if (Array.isArray(survey.questions)) {
+            survey.questions.forEach((question, index) => {
+              const responseValue = response.responses[index];
+              let displayValue = responseValue;
 
-          if (question.type === 'rating') {
-            displayValue = `${responseValue}/5`;
-          } else if (question.type === 'multiple_choice') {
-            displayValue = responseValue;
+              if (question.type === 'rating') {
+                displayValue = `${responseValue}/5`;
+              } else if (question.type === 'multiple_choice') {
+                displayValue = responseValue;
+              }
+
+              row[`Soru ${index + 1}: ${question.question}`] = displayValue || "Cevapsız";
+            });
           }
-
-          row[`Soru ${index + 1}: ${question.question}`] = displayValue || "Cevapsız";
-        });
-      }
 
       return row;
     });
