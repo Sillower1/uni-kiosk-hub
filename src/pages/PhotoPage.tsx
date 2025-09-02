@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Camera, Download, Share2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight, Camera, Download, Share2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import QRCode from 'react-qr-code';
 
 const photoFrames = [
   { id: 1, name: 'DEÜ Klasik', preview: '/placeholder.svg', style: 'border-8 border-primary' },
@@ -18,6 +20,8 @@ export default function PhotoPage() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [isMirrored, setIsMirrored] = useState(true);
+  const [showQR, setShowQR] = useState(false);
+  const [shareableImageUrl, setShareableImageUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const nextFrame = () => {
@@ -99,10 +103,32 @@ export default function PhotoPage() {
   const resetPhoto = () => {
     setPhotoTaken(false);
     setPreviewImage(null);
-    setCameraActive(false);
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
+    setShowQR(false);
+    setShareableImageUrl(null);
+    // Kamerayı açık tut, sadece fotoğrafı sıfırla
+    if (!cameraActive) {
+      startCamera();
+    }
+  };
+
+  const downloadPhoto = () => {
+    if (previewImage) {
+      const link = document.createElement('a');
+      link.href = previewImage;
+      link.download = `deu-ybs-hatira-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const sharePhoto = () => {
+    if (previewImage) {
+      // Paylaşılabilir URL oluştur (base64'ü encode et)
+      const encodedImage = encodeURIComponent(previewImage);
+      const shareUrl = `${window.location.origin}/shared-photo?img=${encodedImage}&frame=${photoFrames[currentFrame].name}`;
+      setShareableImageUrl(shareUrl);
+      setShowQR(true);
     }
   };
 
@@ -244,6 +270,7 @@ export default function PhotoPage() {
                   Yeniden Çek
                 </Button>
                 <Button
+                  onClick={downloadPhoto}
                   size="lg"
                   className="bg-accent hover:bg-accent-hover text-lg px-8 py-4"
                 >
@@ -251,6 +278,7 @@ export default function PhotoPage() {
                   İndir
                 </Button>
                 <Button
+                  onClick={sharePhoto}
                   size="lg"
                   variant="outline"
                   className="text-lg px-8 py-4"
@@ -263,6 +291,36 @@ export default function PhotoPage() {
           </div>
         </div>
       </div>
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQR} onOpenChange={setShowQR}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Fotoğrafı Paylaş</DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-4 top-4"
+              onClick={() => setShowQR(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-4 p-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Bu QR kodu okutarak fotoğrafı telefonunuza indirebilirsiniz
+            </p>
+            {shareableImageUrl && (
+              <div className="bg-white p-4 rounded-lg">
+                <QRCode value={shareableImageUrl} size={200} />
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground text-center">
+              QR kodu telefonunuzun kamerası ile okutun
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

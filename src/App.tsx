@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { KioskLayout } from "@/components/KioskLayout";
 import HomePage from "./pages/HomePage";
 import PhotoPage from "./pages/PhotoPage";
+import SharedPhotoPage from "./pages/SharedPhotoPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import MapPage from "./pages/MapPage";
 import SchedulePage from "./pages/SchedulePage";
@@ -28,6 +29,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/photo" element={<PhotoPage />} />
+            <Route path="/shared-photo" element={<SharedPhotoPage />} />
             <Route path="/announcements" element={<AnnouncementsPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/schedule" element={<SchedulePage />} />
