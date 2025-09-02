@@ -15,6 +15,8 @@ export default function PhotoPage() {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [photoTaken, setPhotoTaken] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
 
   const nextFrame = () => {
     setCurrentFrame((prev) => (prev + 1) % photoFrames.length);
@@ -24,15 +26,55 @@ export default function PhotoPage() {
     setCurrentFrame((prev) => (prev - 1 + photoFrames.length) % photoFrames.length);
   };
 
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user' } 
+      });
+      setStream(mediaStream);
+      setCameraActive(true);
+      
+      const video = document.getElementById('camera-video') as HTMLVideoElement;
+      if (video) {
+        video.srcObject = mediaStream;
+      }
+    } catch (error) {
+      console.error('Kamera erişimi başarısız:', error);
+      alert('Kamera erişimi için izin gerekli');
+    }
+  };
+
   const takePhoto = () => {
-    // Simulate taking a photo
-    setPhotoTaken(true);
-    setPreviewImage('/placeholder.svg');
+    const video = document.getElementById('camera-video') as HTMLVideoElement;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    if (video && context) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0);
+      
+      const photoDataUrl = canvas.toDataURL('image/png');
+      setPreviewImage(photoDataUrl);
+      setPhotoTaken(true);
+      
+      // Stop camera
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setStream(null);
+        setCameraActive(false);
+      }
+    }
   };
 
   const resetPhoto = () => {
     setPhotoTaken(false);
     setPreviewImage(null);
+    setCameraActive(false);
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
   };
 
   return (
@@ -49,11 +91,23 @@ export default function PhotoPage() {
         {/* Main Photo Area */}
         <Card className="mb-8 p-8 bg-gradient-to-br from-card to-secondary/10 shadow-lg">
           <div className="aspect-[4/3] max-w-2xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-2xl border-4 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
-            {previewImage ? (
+            {photoTaken && previewImage ? (
               <div className={cn("w-full h-full relative", photoFrames[currentFrame].style)}>
                 <img 
                   src={previewImage} 
                   alt="Preview" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
+                  {photoFrames[currentFrame].name}
+                </div>
+              </div>
+            ) : cameraActive ? (
+              <div className={cn("w-full h-full relative", photoFrames[currentFrame].style)}>
+                <video
+                  id="camera-video"
+                  autoPlay
+                  playsInline
                   className="w-full h-full object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
@@ -119,14 +173,25 @@ export default function PhotoPage() {
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
             {!photoTaken ? (
-              <Button
-                onClick={takePhoto}
-                size="lg"
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
-              >
-                <Camera className="w-8 h-8 mr-3" />
-                Fotoğraf Çek
-              </Button>
+              !cameraActive ? (
+                <Button
+                  onClick={startCamera}
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
+                >
+                  <Camera className="w-8 h-8 mr-3" />
+                  Kamerayı Aç
+                </Button>
+              ) : (
+                <Button
+                  onClick={takePhoto}
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
+                >
+                  <Camera className="w-8 h-8 mr-3" />
+                  Fotoğraf Çek
+                </Button>
+              )
             ) : (
               <>
                 <Button

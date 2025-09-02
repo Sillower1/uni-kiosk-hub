@@ -7,8 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, X } from "lucide-react";
 
 interface Survey {
   id: string;
@@ -28,7 +29,7 @@ export const SurveysManager = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    questions: [{ question: "", type: "text", options: [] }],
+    questions: [{ question: "", type: "text", options: [], required: false }],
     is_active: true,
     expires_at: "",
   });
@@ -98,7 +99,7 @@ export const SurveysManager = () => {
     setFormData({
       title: survey.title,
       description: survey.description || "",
-      questions: Array.isArray(survey.questions) ? survey.questions : [{ question: "", type: "text", options: [] }],
+      questions: Array.isArray(survey.questions) ? survey.questions : [{ question: "", type: "text", options: [], required: false }],
       is_active: survey.is_active,
       expires_at: survey.expires_at ? survey.expires_at.split('T')[0] : "",
     });
@@ -125,13 +126,39 @@ export const SurveysManager = () => {
   const addQuestion = () => {
     setFormData({
       ...formData,
-      questions: [...formData.questions, { question: "", type: "text", options: [] }]
+      questions: [...formData.questions, { question: "", type: "text", options: [], required: false }]
     });
   };
 
   const updateQuestion = (index: number, field: string, value: any) => {
     const newQuestions = [...formData.questions];
     newQuestions[index] = { ...newQuestions[index], [field]: value };
+    
+    // Reset options when type changes
+    if (field === 'type' && value !== 'multiple_choice') {
+      newQuestions[index].options = [];
+    } else if (field === 'type' && value === 'multiple_choice' && !newQuestions[index].options?.length) {
+      newQuestions[index].options = [''];
+    }
+    
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const addOption = (questionIndex: number) => {
+    const newQuestions = [...formData.questions];
+    newQuestions[questionIndex].options = [...(newQuestions[questionIndex].options || []), ''];
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const updateOption = (questionIndex: number, optionIndex: number, value: string) => {
+    const newQuestions = [...formData.questions];
+    newQuestions[questionIndex].options[optionIndex] = value;
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const removeOption = (questionIndex: number, optionIndex: number) => {
+    const newQuestions = [...formData.questions];
+    newQuestions[questionIndex].options = newQuestions[questionIndex].options.filter((_, i) => i !== optionIndex);
     setFormData({ ...formData, questions: newQuestions });
   };
 
@@ -144,7 +171,7 @@ export const SurveysManager = () => {
     setFormData({
       title: "",
       description: "",
-      questions: [{ question: "", type: "text", options: [] }],
+      questions: [{ question: "", type: "text", options: [], required: false }],
       is_active: true,
       expires_at: "",
     });
@@ -216,7 +243,7 @@ export const SurveysManager = () => {
                 </div>
                 
                 {formData.questions.map((question, index) => (
-                  <div key={index} className="border p-4 rounded space-y-2">
+                  <div key={index} className="border p-4 rounded space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="font-medium">Soru {index + 1}</span>
                       {formData.questions.length > 1 && (
@@ -230,12 +257,77 @@ export const SurveysManager = () => {
                         </Button>
                       )}
                     </div>
-                    <Input
-                      placeholder="Soruyu yazın"
-                      value={question.question}
-                      onChange={(e) => updateQuestion(index, "question", e.target.value)}
-                      required
-                    />
+                    
+                    <div>
+                      <Label>Soru Metni</Label>
+                      <Input
+                        placeholder="Soruyu yazın"
+                        value={question.question}
+                        onChange={(e) => updateQuestion(index, "question", e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Cevap Türü</Label>
+                      <Select
+                        value={question.type}
+                        onValueChange={(value) => updateQuestion(index, "type", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Cevap türünü seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="text">Açık Uçlu</SelectItem>
+                          <SelectItem value="rating">1-5 Puan</SelectItem>
+                          <SelectItem value="multiple_choice">Çoktan Seçmeli</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {question.type === 'multiple_choice' && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <Label>Seçenekler</Label>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => addOption(index)}
+                          >
+                            Seçenek Ekle
+                          </Button>
+                        </div>
+                        {(question.options || []).map((option, optionIndex) => (
+                          <div key={optionIndex} className="flex gap-2">
+                            <Input
+                              placeholder={`Seçenek ${optionIndex + 1}`}
+                              value={option}
+                              onChange={(e) => updateOption(index, optionIndex, e.target.value)}
+                              required
+                            />
+                            {question.options && question.options.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeOption(index, optionIndex)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id={`required-${index}`}
+                        checked={question.required}
+                        onCheckedChange={(checked) => updateQuestion(index, "required", checked)}
+                      />
+                      <Label htmlFor={`required-${index}`}>Zorunlu Soru</Label>
+                    </div>
                   </div>
                 ))}
               </div>
