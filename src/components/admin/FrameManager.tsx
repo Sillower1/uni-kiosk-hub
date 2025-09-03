@@ -24,6 +24,27 @@ interface FormData {
   display_order: number;
 }
 
+// Sanitizes filenames to ASCII-safe kebab-case and preserves extension
+function sanitizeFileName(name: string) {
+  // Turkish character map + general diacritics removal
+  const map: Record<string, string> = {
+    'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ş': 's', 'Ş': 'S',
+    'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O', 'ü': 'u', 'Ü': 'U'
+  };
+  const replaced = name.replace(/[çÇğĞşŞıİöÖüÜ]/g, (ch) => map[ch] || ch);
+  const parts = replaced.split('.');
+  const ext = (parts.length > 1 ? parts.pop() : 'png')!.toLowerCase();
+  const base = parts.join('.') || 'frame';
+  const safeBase = base
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+    .replace(/[^a-zA-Z0-9-_]+/g, '-') // non-safe to hyphen
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  const safeExt = ext === 'jpeg' ? 'jpg' : ext;
+  return `${safeBase || 'frame'}.${safeExt || 'png'}`;
+}
+
 export default function FrameManager() {
   const [frames, setFrames] = useState<Frame[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,10 +85,16 @@ export default function FrameManager() {
 
       // Eğer yeni bir resim yüklendiyse
       if (imageFile) {
-        const fileName = `frame-${Date.now()}-${imageFile.name}`;
+        const safeOriginal = sanitizeFileName(imageFile.name);
+        const timestamp = Date.now();
+        const fileName = `frame-${timestamp}-${safeOriginal}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('frames')
-          .upload(fileName, imageFile);
+          .upload(fileName, imageFile, {
+            contentType: imageFile.type || 'image/png',
+            cacheControl: '3600',
+            upsert: false,
+          });
 
         if (uploadError) throw uploadError;
 
@@ -209,7 +236,7 @@ export default function FrameManager() {
                 <Input
                   id="image"
                   type="file"
-                  accept="image/png,image/jpeg,image/jpg"
+                  accept="image/png"
                   onChange={handleImageChange}
                 />
                 {imagePreview && (
