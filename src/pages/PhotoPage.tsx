@@ -196,9 +196,41 @@ export default function PhotoPage() {
     }
   };
 
-  const sharePhoto = () => {
-    if (previewImage && photoFrames.length > 0) {
-      // Basit URL oluştur
+  const sharePhoto = async () => {
+    if (!previewImage) return;
+
+    try {
+      // Canvas'tan blob oluştur
+      const response = await fetch(previewImage);
+      const blob = await response.blob();
+      
+      // Web Share API kontrolü
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `deu-ybs-hatira-${Date.now()}.png`, { type: 'image/png' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'DEÜ YBS Hatıra Fotoğrafı',
+            text: `${photoFrames[currentFrame]?.name || 'DEÜ'} çerçevesi ile çekildi`,
+            files: [file]
+          });
+          return;
+        }
+      }
+      
+      // Fallback: İndirme linki oluştur
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `deu-ybs-hatira-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Paylaşım hatası:', error);
+      // Basit QR fallback
       const shareUrl = `${window.location.origin}/shared-photo?t=${Date.now()}`;
       setShareableImageUrl(shareUrl);
       setShowQR(true);
