@@ -24,7 +24,24 @@ export default function PhotoPage() {
   const [isMirrored, setIsMirrored] = useState(true);
   const [showQR, setShowQR] = useState(false);
   const [shareableImageUrl, setShareableImageUrl] = useState<string | null>(null);
+  const [photoTimer, setPhotoTimer] = useState(0);
+  const [isCountingDown, setIsCountingDown] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isCountingDown && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (isCountingDown && countdown === 0) {
+      setIsCountingDown(false);
+      takePhoto();
+    }
+    return () => clearInterval(interval);
+  }, [isCountingDown, countdown]);
 
   useEffect(() => {
     fetchFrames();
@@ -91,6 +108,15 @@ export default function PhotoPage() {
       }
     };
   }, [stream]);
+
+  const startPhotoTimer = () => {
+    if (photoTimer === 0) {
+      takePhoto();
+    } else {
+      setCountdown(photoTimer);
+      setIsCountingDown(true);
+    }
+  };
 
   const takePhoto = async () => {
     const video = videoRef.current;
@@ -172,9 +198,8 @@ export default function PhotoPage() {
 
   const sharePhoto = () => {
     if (previewImage && photoFrames.length > 0) {
-      // Paylaşılabilir URL oluştur (base64'ü encode et)
-      const encodedImage = encodeURIComponent(previewImage);
-      const shareUrl = `${window.location.origin}/shared-photo?img=${encodedImage}&frame=${photoFrames[currentFrame]?.name || 'DEÜ Klasik'}`;
+      // Basit URL oluştur
+      const shareUrl = `${window.location.origin}/shared-photo?t=${Date.now()}`;
       setShareableImageUrl(shareUrl);
       setShowQR(true);
     }
@@ -222,6 +247,13 @@ export default function PhotoPage() {
                       alt="Frame overlay"
                       className="w-full h-full object-cover rounded-lg opacity-50"
                     />
+                  </div>
+                )}
+                {isCountingDown && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                    <div className="text-8xl font-bold text-white">
+                      {countdown}
+                    </div>
                   </div>
                 )}
                 <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
@@ -297,23 +329,42 @@ export default function PhotoPage() {
                   Kamerayı Aç
                 </Button>
               ) : (
-                <div className="flex items-center gap-3">
-                  <Button
-                    onClick={takePhoto}
-                    size="lg"
-                    className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
-                  >
-                    <Camera className="w-8 h-8 mr-3" />
-                    Fotoğraf Çek
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => setIsMirrored((v) => !v)}
-                    className="text-lg px-6 py-6"
-                  >
-                    {isMirrored ? 'Aynalamayı Kapat' : 'Aynala'}
-                  </Button>
+                <div className="flex flex-col items-center gap-3">
+                  {/* Timer Selection */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm text-muted-foreground">Gecikme:</span>
+                    {[0, 3, 5, 10].map((seconds) => (
+                      <Button
+                        key={seconds}
+                        variant={photoTimer === seconds ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPhotoTimer(seconds)}
+                        className="w-12 h-8 text-sm"
+                      >
+                        {seconds}s
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Button
+                      onClick={startPhotoTimer}
+                      disabled={isCountingDown}
+                      size="lg"
+                      className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-xl px-12 py-6 rounded-2xl shadow-lg"
+                    >
+                      <Camera className="w-8 h-8 mr-3" />
+                      {isCountingDown ? `${countdown}...` : photoTimer === 0 ? 'Fotoğraf Çek' : `${photoTimer}s Sonra Çek`}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => setIsMirrored((v) => !v)}
+                      className="text-lg px-6 py-6"
+                    >
+                      {isMirrored ? 'Aynalamayı Kapat' : 'Aynala'}
+                    </Button>
+                  </div>
                 </div>
               )
             ) : (
