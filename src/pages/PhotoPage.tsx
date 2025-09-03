@@ -196,42 +196,14 @@ export default function PhotoPage() {
     }
   };
 
-  const sharePhoto = async () => {
-    if (!previewImage) return;
-
-    try {
-      // Canvas'tan blob oluştur
-      const response = await fetch(previewImage);
-      const blob = await response.blob();
+  const sharePhoto = () => {
+    if (previewImage && photoFrames.length > 0) {
+      // Fotoğrafı localStorage'a kaydet
+      const photoId = `photo-${Date.now()}`;
+      localStorage.setItem(photoId, previewImage);
       
-      // Web Share API kontrolü
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], `deu-ybs-hatira-${Date.now()}.png`, { type: 'image/png' });
-        
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'DEÜ YBS Hatıra Fotoğrafı',
-            text: `${photoFrames[currentFrame]?.name || 'DEÜ'} çerçevesi ile çekildi`,
-            files: [file]
-          });
-          return;
-        }
-      }
-      
-      // Fallback: İndirme linki oluştur
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `deu-ybs-hatira-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-    } catch (error) {
-      console.error('Paylaşım hatası:', error);
-      // Basit QR fallback
-      const shareUrl = `${window.location.origin}/shared-photo?t=${Date.now()}`;
+      // QR kod için URL oluştur
+      const shareUrl = `${window.location.origin}/shared-photo?id=${photoId}&frame=${encodeURIComponent(photoFrames[currentFrame]?.name || 'DEÜ Klasik')}`;
       setShareableImageUrl(shareUrl);
       setShowQR(true);
     }
@@ -448,15 +420,15 @@ export default function PhotoPage() {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4 p-4">
             <p className="text-sm text-muted-foreground text-center">
-              Bu QR kodu okutarak fotoğrafı telefonunuza indirebilirsiniz
+              Bu QR kodu telefonunuz ile okutarak fotoğrafı mobil cihazınıza indirebilirsiniz
             </p>
             {shareableImageUrl && (
               <div className="bg-white p-4 rounded-lg">
                 <QRCode value={shareableImageUrl} size={200} />
               </div>
             )}
-            <p className="text-xs text-muted-foreground text-center">
-              QR kodu telefonunuzun kamerası ile okutun
+            <p className="text-xs text-muted-foreground text-center max-w-sm">
+              QR kodu telefonunuzun kamerası ile okutun ve açılan sayfadan "Fotoğrafı İndir" butonuna tıklayın
             </p>
           </div>
         </DialogContent>

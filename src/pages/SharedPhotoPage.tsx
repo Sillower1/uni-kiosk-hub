@@ -16,23 +16,34 @@ export default function SharedPhotoPage() {
   const [searchParams] = useSearchParams();
   const [imageData, setImageData] = useState<string | null>(null);
   const [frameName, setFrameName] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const imgParam = searchParams.get('img');
+    // Yeni ID bazlı sistem kontrolü
+    const photoId = searchParams.get('id');
     const frameParam = searchParams.get('frame');
     
-    if (imgParam) {
-      try {
-        const decodedImage = decodeURIComponent(imgParam);
-        setImageData(decodedImage);
-      } catch (error) {
-        console.error('Fotoğraf yüklenemedi:', error);
+    if (photoId) {
+      const savedPhoto = localStorage.getItem(photoId);
+      if (savedPhoto) {
+        setImageData(savedPhoto);
+        setFrameName(decodeURIComponent(frameParam || 'DEÜ Klasik'));
+      }
+    } else {
+      // Eski URL sistemi desteği (geriye dönük uyumluluk)
+      const imgParam = searchParams.get('img');
+      if (imgParam) {
+        try {
+          const decodedImage = decodeURIComponent(imgParam);
+          setImageData(decodedImage);
+          setFrameName(frameParam || 'DEÜ Klasik');
+        } catch (error) {
+          console.error('Fotoğraf yüklenemedi:', error);
+        }
       }
     }
     
-    if (frameParam) {
-      setFrameName(frameParam);
-    }
+    setLoading(false);
   }, [searchParams]);
 
   const downloadPhoto = () => {
@@ -50,6 +61,17 @@ export default function SharedPhotoPage() {
     const frame = photoFrames.find(f => f.name === frameName);
     return frame ? frame.style : photoFrames[0].style;
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Fotoğraf yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!imageData) {
     return (
