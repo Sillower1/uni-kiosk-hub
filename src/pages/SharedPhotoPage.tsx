@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Download, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const photoFrames = [
   { id: 1, name: 'DEÜ Klasik', style: 'border-8 border-primary' },
@@ -19,31 +20,62 @@ export default function SharedPhotoPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Yeni ID bazlı sistem kontrolü
-    const photoId = searchParams.get('id');
-    const frameParam = searchParams.get('frame');
-    
-    if (photoId) {
-      const savedPhoto = localStorage.getItem(photoId);
-      if (savedPhoto) {
-        setImageData(savedPhoto);
-        setFrameName(decodeURIComponent(frameParam || 'DEÜ Klasik'));
-      }
-    } else {
-      // Eski URL sistemi desteği (geriye dönük uyumluluk)
-      const imgParam = searchParams.get('img');
-      if (imgParam) {
-        try {
-          const decodedImage = decodeURIComponent(imgParam);
-          setImageData(decodedImage);
-          setFrameName(frameParam || 'DEÜ Klasik');
-        } catch (error) {
-          console.error('Fotoğraf yüklenemedi:', error);
+    const fetchPhoto = async () => {
+      const photoId = searchParams.get('id');
+      const frameParam = searchParams.get('frame');
+      
+      if (photoId) {
+        // UUID formatında ise veritabanından çek
+        if (photoId.includes('-')) {
+          try {
+            const { data, error } = await supabase
+              .from('saved_photos')
+              .select('*')
+              .eq('id', photoId)
+              .eq('is_public', true)
+              .single();
+
+            if (error) throw error;
+            
+            // Süre kontrolü
+            if (data.share_expires_at && new Date(data.share_expires_at) < new Date()) {
+              setImageData(null);
+              setLoading(false);
+              return;
+            }
+            
+            setImageData(data.image_data);
+            setFrameName(data.frame_name);
+          } catch (error) {
+            console.error('Error fetching photo:', error);
+            setImageData(null);
+          }
+        } else {
+          // Eski localStorage sistemi
+          const savedPhoto = localStorage.getItem(photoId);
+          if (savedPhoto) {
+            setImageData(savedPhoto);
+            setFrameName(decodeURIComponent(frameParam || 'DEÜ Klasik'));
+          }
+        }
+      } else {
+        // Eski URL sistemi desteği (geriye dönük uyumluluk)
+        const imgParam = searchParams.get('img');
+        if (imgParam) {
+          try {
+            const decodedImage = decodeURIComponent(imgParam);
+            setImageData(decodedImage);
+            setFrameName(frameParam || 'DEÜ Klasik');
+          } catch (error) {
+            console.error('Fotoğraf yüklenemedi:', error);
+          }
         }
       }
-    }
-    
-    setLoading(false);
+      
+      setLoading(false);
+    };
+
+    fetchPhoto();
   }, [searchParams]);
 
   const downloadPhoto = () => {
@@ -79,7 +111,7 @@ export default function SharedPhotoPage() {
         <Card className="p-8 text-center">
           <h1 className="text-2xl font-bold text-primary mb-4">Fotoğraf Bulunamadı</h1>
           <p className="text-muted-foreground mb-6">
-            Paylaşılan fotoğraf yüklenemedi. Lütfen QR kodu tekrar okutun.
+            Paylaşılan fotoğraf bulunamadı veya süresi dolmuş. Lütfen QR kodu tekrar okutun.
           </p>
           <Button onClick={() => window.history.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />

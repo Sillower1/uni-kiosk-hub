@@ -158,6 +158,51 @@ export type Database = {
         }
         Relationships: []
       }
+      markers: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          type: string
+          updated_at: string
+          x_position: number
+          y_position: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          type: string
+          updated_at?: string
+          x_position: number
+          y_position: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          type?: string
+          updated_at?: string
+          x_position?: number
+          y_position?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -184,6 +229,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      saved_photos: {
+        Row: {
+          created_at: string
+          frame_id: string | null
+          frame_name: string
+          id: string
+          image_data: string
+          is_public: boolean
+          share_expires_at: string | null
+          shared_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          frame_id?: string | null
+          frame_name: string
+          id?: string
+          image_data: string
+          is_public?: boolean
+          share_expires_at?: string | null
+          shared_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          frame_id?: string | null
+          frame_name?: string
+          id?: string
+          image_data?: string
+          is_public?: boolean
+          share_expires_at?: string | null
+          shared_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_photos_frame_id_fkey"
+            columns: ["frame_id"]
+            isOneToOne: false
+            referencedRelation: "frames"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       survey_responses: {
         Row: {

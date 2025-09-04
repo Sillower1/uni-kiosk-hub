@@ -185,27 +185,63 @@ export default function PhotoPage() {
     }
   };
 
-  const downloadPhoto = () => {
-    if (previewImage) {
-      const link = document.createElement('a');
-      link.href = previewImage;
-      link.download = `deu-ybs-hatira-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const savePhoto = async () => {
+    if (previewImage && photoFrames.length > 0) {
+      try {
+        const { error } = await supabase
+          .from('saved_photos')
+          .insert({
+            image_data: previewImage,
+            frame_name: photoFrames[currentFrame]?.name || 'DEÜ Klasik',
+            frame_id: photoFrames[currentFrame]?.id || null,
+          });
+
+        if (error) throw error;
+        
+        // Fotoğrafı indirmek için de kullan
+        const link = document.createElement('a');
+        link.href = previewImage;
+        link.download = `deu-ybs-hatira-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error saving photo:', error);
+        alert('Fotoğraf kaydedilirken hata oluştu');
+      }
     }
   };
 
-  const sharePhoto = () => {
+  const saveAndSharePhoto = async () => {
     if (previewImage && photoFrames.length > 0) {
-      // Fotoğrafı localStorage'a kaydet
-      const photoId = `photo-${Date.now()}`;
-      localStorage.setItem(photoId, previewImage);
-      
-      // QR kod için URL oluştur
-      const shareUrl = `${window.location.origin}/shared-photo?id=${photoId}&frame=${encodeURIComponent(photoFrames[currentFrame]?.name || 'DEÜ Klasik')}`;
-      setShareableImageUrl(shareUrl);
-      setShowQR(true);
+      try {
+        // 5 dakika sonra expire olacak tarih
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+        
+        const { data, error } = await supabase
+          .from('saved_photos')
+          .insert({
+            image_data: previewImage,
+            frame_name: photoFrames[currentFrame]?.name || 'DEÜ Klasik',
+            frame_id: photoFrames[currentFrame]?.id || null,
+            shared_at: new Date().toISOString(),
+            share_expires_at: expiresAt.toISOString(),
+            is_public: true,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        // QR kod için URL oluştur
+        const shareUrl = `${window.location.origin}/shared-photo?id=${data.id}`;
+        setShareableImageUrl(shareUrl);
+        setShowQR(true);
+      } catch (error) {
+        console.error('Error saving and sharing photo:', error);
+        alert('Fotoğraf kaydedilip paylaşılırken hata oluştu');
+      }
     }
   };
 
@@ -382,21 +418,21 @@ export default function PhotoPage() {
                   Yeniden Çek
                 </Button>
                 <Button
-                  onClick={downloadPhoto}
+                  onClick={savePhoto}
                   size="lg"
                   className="bg-accent hover:bg-accent-hover text-lg px-8 py-4"
                 >
                   <Download className="w-6 h-6 mr-2" />
-                  İndir
+                  Kaydet
                 </Button>
                 <Button
-                  onClick={sharePhoto}
+                  onClick={saveAndSharePhoto}
                   size="lg"
                   variant="outline"
                   className="text-lg px-8 py-4"
                 >
                   <Share2 className="w-6 h-6 mr-2" />
-                  Paylaş
+                  Kaydet ve Paylaş
                 </Button>
               </>
             )}
@@ -420,7 +456,7 @@ export default function PhotoPage() {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4 p-4">
             <p className="text-sm text-muted-foreground text-center">
-              Bu QR kodu telefonunuz ile okutarak fotoğrafı mobil cihazınıza indirebilirsiniz
+              Bu QR kodu telefonunuz ile okutarak fotoğrafı mobil cihazınıza indirebilirsiniz (5 dakika geçerli)
             </p>
             {shareableImageUrl && (
               <div className="bg-white p-4 rounded-lg">
