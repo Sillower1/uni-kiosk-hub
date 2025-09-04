@@ -158,51 +158,6 @@ export type Database = {
         }
         Relationships: []
       }
-      markers: {
-        Row: {
-          created_at: string
-          created_by: string
-          description: string | null
-          id: string
-          is_active: boolean | null
-          latitude: number | null
-          longitude: number | null
-          name: string
-          type: string
-          updated_at: string
-          x_position: number
-          y_position: number
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
-          name: string
-          type: string
-          updated_at?: string
-          x_position: number
-          y_position: number
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
-          name?: string
-          type?: string
-          updated_at?: string
-          x_position?: number
-          y_position?: number
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
