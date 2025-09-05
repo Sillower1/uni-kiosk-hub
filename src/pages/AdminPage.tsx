@@ -6,6 +6,7 @@ import { FacultyManager } from '@/components/admin/FacultyManager';
 import { ScheduleManager } from '@/components/admin/ScheduleManager';
 import FrameManager from '@/components/admin/FrameManager';
 import SavedPhotosManager from '@/components/admin/SavedPhotosManager';
+import FacultyImporter from '@/components/admin/FacultyImporter';
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('announcements');
@@ -37,6 +38,7 @@ const AdminPage = () => {
           </TabsContent>
 
           <TabsContent value="faculty" className="space-y-4">
+            <FacultyImporter />
             <FacultyManager />
           </TabsContent>
 
