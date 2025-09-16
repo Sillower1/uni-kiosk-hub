@@ -160,6 +160,7 @@ export type Database = {
       }
       markers: {
         Row: {
+          color: string | null
           created_at: string
           created_by: string
           description: string | null
@@ -174,6 +175,7 @@ export type Database = {
           y_position: number
         }
         Insert: {
+          color?: string | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -188,6 +190,7 @@ export type Database = {
           y_position: number
         }
         Update: {
+          color?: string | null
           created_at?: string
           created_by?: string
           description?: string | null

@@ -188,6 +188,10 @@ export default function PhotoPage() {
   const savePhoto = async () => {
     if (previewImage && photoFrames.length > 0) {
       try {
+        // Tüm fotoğraflar 5 dakika sonra silinecek
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+        
         const { error } = await supabase
           .from('saved_photos')
           .insert({
