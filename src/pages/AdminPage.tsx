@@ -11,6 +11,7 @@ import FacultyImporter from '@/components/admin/FacultyImporter';
 import ProtectedRoute from '@/components/ProtectedRoute'; // Yeni komponenti import ediyoruz
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import MapManager from '@/components/admin/MapManager';
 
 // Mevcut AdminPage içeriğinizi ayrı bir komponente taşıyoruz
 const AdminPanelContent = () => {
@@ -40,6 +41,7 @@ const AdminPanelContent = () => {
             <TabsTrigger value="faculty">Öğretim Üyeleri</TabsTrigger>
             <TabsTrigger value="schedule">Ders Programı</TabsTrigger>
             <TabsTrigger value="frames">Çerçeveler</TabsTrigger>
+            <TabsTrigger value="map">Harita</TabsTrigger>
             <TabsTrigger value="photos">Fotoğraflar</TabsTrigger>
           </TabsList>
 
@@ -61,6 +63,9 @@ const AdminPanelContent = () => {
           </TabsContent>
           <TabsContent value="photos" className="space-y-4">
             <SavedPhotosManager />
+          </TabsContent>
+          <TabsContent value="map" className="space-y-4">
+            <MapManager />
           </TabsContent>
         </Tabs>
       </div>

@@ -21,9 +21,9 @@ const quickActions = [
 ];
 
 const stats = [
-  { label: 'Aktif Öğrenci', value: '847', icon: GraduationCap },
+  { label: 'Aktif Öğrenci', value: '650+', icon: GraduationCap },
   { label: 'Öğretim Üyesi', value: '23', icon: Users },
-  { label: 'Bu Hafta Ders', value: '156', icon: Clock },
+  { label: 'Mezun Sayımız', value: '2000', icon: Clock },
   { label: 'Kampüs Alanı', value: '2.5km²', icon: MapPin }
 ];
 
