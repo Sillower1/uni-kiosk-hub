@@ -34,35 +34,40 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary via-primary-hover to-accent text-white py-16 px-6">
-        {/* Sol Logo */}
-        <div className="absolute left-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block">
-          <img 
-            src="/deu.png" 
-            alt="DEÜ Logo" 
-            className="h-32 w-32 object-contain"
-          />
-        </div>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center gap-8">
+            {/* Sol Logo */}
+            <div className="hidden lg:block flex-shrink-0">
+              <img 
+                src="/deu.png" 
+                alt="DEÜ Logo" 
+                className="h-32 w-32 object-contain"
+              />
+            </div>
 
-        {/* Sağ Logo */}
-        <div className="absolute right-1/4 top-1/2 translate-x-1/2 -translate-y-1/2 hidden lg:block">
-          <img 
-            src="/deu-ybs-logo.png" 
-            alt="DEÜ YBS Logo" 
-            className="h-32 w-32 object-contain"
-          />
-        </div>
+            {/* Orta Yazı */}
+            <div className="text-center">
+              <h1 className="text-5xl font-bold mb-4">
+                Dokuz Eylül Üniversitesi
+              </h1>
+              <h2 className="text-3xl font-semibold mb-6 opacity-90">
+                Yönetim Bilişim Sistemleri
+              </h2>
+              <p className="text-xl opacity-80 max-w-2xl mx-auto">
+                İnteraktif kiosk sistemimize hoş geldiniz. Bölümümüz hakkında bilgi alın, 
+                duyuruları takip edin ve hatıra fotoğraflarınızı çekin.
+              </p>
+            </div>
 
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">
-            Dokuz Eylül Üniversitesi
-          </h1>
-          <h2 className="text-3xl font-semibold mb-6 opacity-90">
-            Yönetim Bilişim Sistemleri
-          </h2>
-          <p className="text-xl opacity-80 max-w-2xl mx-auto">
-            İnteraktif kiosk sistemimize hoş geldiniz. Bölümümüz hakkında bilgi alın, 
-            duyuruları takip edin ve hatıra fotoğraflarınızı çekin.
-          </p>
+            {/* Sağ Logo */}
+            <div className="hidden lg:block flex-shrink-0">
+              <img 
+                src="/deu-ybs-logo.png" 
+                alt="DEÜ YBS Logo" 
+                className="h-32 w-32 object-contain"
+              />
+            </div>
+          </div>
         </div>
         
         {/* Decorative Elements */}
