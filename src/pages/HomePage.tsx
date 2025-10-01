@@ -35,7 +35,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary via-primary-hover to-accent text-white py-16 px-6">
         {/* Sol Logo */}
-        <div className="absolute left-8 top-1/2 -translate-y-1/2 hidden md:block">
+        <div className="absolute left-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block">
           <img 
             src="/deu.png" 
             alt="DEÜ Logo" 
@@ -44,7 +44,7 @@ export default function HomePage() {
         </div>
 
         {/* Sağ Logo */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden md:block">
+        <div className="absolute right-1/4 top-1/2 translate-x-1/2 -translate-y-1/2 hidden lg:block">
           <img 
             src="/deu-ybs-logo.png" 
             alt="DEÜ YBS Logo" 
