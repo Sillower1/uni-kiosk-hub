@@ -34,6 +34,24 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary via-primary-hover to-accent text-white py-16 px-6">
+        {/* Sol Logo */}
+        <div className="absolute left-8 top-1/2 -translate-y-1/2 hidden md:block">
+          <img 
+            src="/deu.png" 
+            alt="DEÜ Logo" 
+            className="h-32 w-32 object-contain"
+          />
+        </div>
+
+        {/* Sağ Logo */}
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden md:block">
+          <img 
+            src="/deu-ybs-logo.png" 
+            alt="DEÜ YBS Logo" 
+            className="h-32 w-32 object-contain"
+          />
+        </div>
+
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">
             Dokuz Eylül Üniversitesi
