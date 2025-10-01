@@ -124,8 +124,12 @@ export default function PhotoPage() {
     const context = canvas.getContext('2d');
 
     if (video && context && photoFrames.length > 0) {
-      canvas.width = video.videoWidth || video.clientWidth;
-      canvas.height = video.videoHeight || video.clientHeight;
+      // Daha yüksek çözünürlük için 2x scale
+      const scale = 2;
+      const baseWidth = video.videoWidth || video.clientWidth;
+      const baseHeight = video.videoHeight || video.clientHeight;
+      canvas.width = baseWidth * scale;
+      canvas.height = baseHeight * scale;
 
       // Video çiziminde aynalama uygula
       if (isMirrored) {
@@ -169,7 +173,10 @@ export default function PhotoPage() {
       const frameImage = new Image();
       frameImage.crossOrigin = 'anonymous';
       frameImage.onload = () => {
-        // Çerçeve resmini video boyutlarına uyacak şekilde çiz
+        // Yüksek kaliteli çizim için imageSmoothingQuality ayarla
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
+        // Çerçeve resmini yüksek çözünürlükte çiz
         context.drawImage(frameImage, 0, 0, width, height);
         resolve();
       };
