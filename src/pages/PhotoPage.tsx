@@ -127,7 +127,9 @@ export default function PhotoPage() {
       canvas.width = video.videoWidth || video.clientWidth;
       canvas.height = video.videoHeight || video.clientHeight;
 
+      // Video çiziminde aynalama uygula
       if (isMirrored) {
+        context.save();
         context.translate(canvas.width, 0);
         context.scale(-1, 1);
       }
@@ -135,7 +137,12 @@ export default function PhotoPage() {
       // Önce video görüntüsünü çiz
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Çerçeveyi PNG olarak overlay et
+      // Aynalama varsa geri al
+      if (isMirrored) {
+        context.restore();
+      }
+
+      // Çerçeveyi PNG olarak overlay et (aynalama olmadan)
       await applyFrameOverlay(context, canvas.width, canvas.height);
 
       const photoDataUrl = canvas.toDataURL('image/png');
