@@ -33,6 +33,7 @@ const SurveyDetailPage = () => {
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const textareaRefs = useRef<Record<number, HTMLTextAreaElement | null>>({});
 
   useEffect(() => {
     if (id) {
@@ -130,7 +131,6 @@ const SurveyDetailPage = () => {
 
   const renderQuestion = (question: Question, questionIndex: number) => {
     const value = responses[questionIndex] || "";
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     switch (question.type) {
       case "rating":
@@ -169,7 +169,7 @@ const SurveyDetailPage = () => {
         return (
           <div className="flex gap-2">
             <Textarea
-              ref={textareaRef}
+              ref={(el) => textareaRefs.current[questionIndex] = el}
               value={value}
               onChange={(e) => handleResponseChange(questionIndex, e.target.value)}
               placeholder="Cevabınızı buraya yazın..."
@@ -179,7 +179,7 @@ const SurveyDetailPage = () => {
               type="button"
               variant="outline"
               size="icon"
-              onClick={() => textareaRef.current?.focus()}
+              onClick={() => textareaRefs.current[questionIndex]?.focus()}
               className="shrink-0"
             >
               <Keyboard className="h-4 w-4" />
