@@ -174,12 +174,21 @@ const SurveyDetailPage = () => {
               onChange={(e) => handleResponseChange(questionIndex, e.target.value)}
               placeholder="Cevabınızı buraya yazın..."
               className="min-h-[100px] flex-1"
+              inputMode="text"
+              autoComplete="off"
             />
             <Button
               type="button"
               variant="outline"
               size="icon"
-              onClick={() => textareaRefs.current[questionIndex]?.focus()}
+              onClick={(e) => {
+                e.preventDefault();
+                const textarea = textareaRefs.current[questionIndex];
+                if (textarea) {
+                  textarea.focus();
+                  textarea.click();
+                }
+              }}
               className="shrink-0"
             >
               <Keyboard className="h-4 w-4" />
