@@ -276,7 +276,7 @@ export default function PhotoPage() {
 
         {/* Main Photo Area */}
         <Card className="mb-1 p-1.5 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-shrink min-h-0" style={{ flexBasis: '65%' }}>
-          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
               <div className="w-full h-full relative flex items-center justify-center">
                 <img 
@@ -284,6 +284,8 @@ export default function PhotoPage() {
                   alt="Preview" 
                   className="max-w-full max-h-full object-contain rounded-lg"
                 />
+                {/* Vertical dashed guides aligned to frame edges */}
+                <div className="pointer-events-none absolute inset-0 border-x-2 border-dashed border-muted-foreground/20" />
                 <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
                   {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
@@ -303,6 +305,8 @@ export default function PhotoPage() {
                       className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
                       style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                     />
+                    {/* Vertical dashed guides aligned to frame edges */}
+                    <div className="pointer-events-none absolute inset-0 border-x-2 border-dashed border-muted-foreground/20 rounded-none" />
                     {photoFrames[currentFrame] && (
                       <img
                         src={photoFrames[currentFrame].image_url}
