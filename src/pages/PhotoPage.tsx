@@ -135,7 +135,7 @@ export default function PhotoPage() {
     img.src = current.image_url;
   }, [currentFrame, photoFrames]);
 
-  const displayAspectRatio = videoAspectRatio || frameAspectRatio || 3 / 4;
+  const displayAspectRatio = frameAspectRatio || videoAspectRatio || 3 / 4;
 
   const startPhotoTimer = () => {
     if (photoTimer === 0) {
@@ -330,8 +330,8 @@ export default function PhotoPage() {
                       autoPlay
                       playsInline
                       muted
-                      className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
-                      style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
+                      className={cn("w-full h-full object-contain rounded-lg transform-gpu border-0 outline-none ring-0 shadow-none bg-transparent")}
+                      style={{ transform: isMirrored ? 'scaleX(-1)' : 'none', border: 'none', outline: 'none', boxShadow: 'none', background: 'transparent' }}
                     />
                     {photoFrames[currentFrame] && (
                       <img
