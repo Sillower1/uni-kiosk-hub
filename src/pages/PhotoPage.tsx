@@ -27,6 +27,8 @@ export default function PhotoPage() {
   const [photoTimer, setPhotoTimer] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null);
+  const [frameAspectRatio, setFrameAspectRatio] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Countdown timer effect
@@ -94,6 +96,12 @@ export default function PhotoPage() {
         if (playPromise && typeof (playPromise as any).catch === 'function') {
           (playPromise as Promise<void>).catch(() => {});
         }
+        const handleLoadedMetadata = () => {
+          if (video.videoWidth && video.videoHeight) {
+            setVideoAspectRatio(video.videoWidth / video.videoHeight);
+          }
+        };
+        video.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
       } catch (e) {
         console.warn('Video oynatma başlatılamadı');
       }
@@ -108,6 +116,26 @@ export default function PhotoPage() {
       }
     };
   }, [stream]);
+
+  // Aktif çerçevenin en-boy oranını ölç
+  useEffect(() => {
+    const current = photoFrames[currentFrame];
+    if (!current || !current.image_url) {
+      setFrameAspectRatio(null);
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (img.naturalWidth && img.naturalHeight) {
+        setFrameAspectRatio(img.naturalWidth / img.naturalHeight);
+      }
+    };
+    img.onerror = () => setFrameAspectRatio(null);
+    img.src = current.image_url;
+  }, [currentFrame, photoFrames]);
+
+  const displayAspectRatio = frameAspectRatio || videoAspectRatio || 3 / 4;
 
   const startPhotoTimer = () => {
     if (photoTimer === 0) {
@@ -276,24 +304,24 @@ export default function PhotoPage() {
 
         {/* Main Photo Area */}
         <Card className="mb-1 p-1.5 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-shrink min-h-0" style={{ flexBasis: '65%' }}>
-          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
               <div className="w-full h-full relative flex items-center justify-center">
+                <div className="relative max-w-full max-h-full w-full" style={{ aspectRatio: displayAspectRatio }}>
                 <img 
                   src={previewImage} 
                   alt="Preview" 
-                  className="max-w-full max-h-full object-contain rounded-lg"
+                    className="absolute inset-0 w-full h-full object-contain rounded-lg"
                 />
-                {/* Vertical dashed guides aligned to frame edges */}
-                <div className="pointer-events-none absolute inset-0 border-x-2 border-dashed border-muted-foreground/20" />
-                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
-                  {photoFrames[currentFrame]?.name || 'Çerçeve'}
+                  <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
+                    {photoFrames[currentFrame]?.name || 'Çerçeve'}
+                  </div>
                 </div>
               </div>
             ) : cameraActive ? (
               <div className="w-full h-full relative flex items-center justify-center">
                 {/* Fixed inner wrapper so effects don't change outer frame size */}
-                <div className="relative w-full h-full max-w-full max-h-full">
+                <div className="relative max-w-full max-h-full w-full" style={{ aspectRatio: displayAspectRatio }}>
                   {/* Camera box: constrain effects to this box only */}
                   <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg">
                     <video
@@ -305,8 +333,6 @@ export default function PhotoPage() {
                       className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
                       style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                     />
-                    {/* Vertical dashed guides aligned to frame edges */}
-                    <div className="pointer-events-none absolute inset-0 border-x-2 border-dashed border-muted-foreground/20 rounded-none" />
                     {photoFrames[currentFrame] && (
                       <img
                         src={photoFrames[currentFrame].image_url}
