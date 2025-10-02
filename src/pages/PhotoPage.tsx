@@ -29,7 +29,6 @@ export default function PhotoPage() {
   const [countdown, setCountdown] = useState(0);
   const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null);
   const [frameAspectRatio, setFrameAspectRatio] = useState<number | null>(null);
-  const [cameraBoxWidth, setCameraBoxWidth] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Countdown timer effect
@@ -103,24 +102,6 @@ export default function PhotoPage() {
           }
         };
         video.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
-        // Ekrandaki gerçek video genişliğini izleyip iç kutu genişliğini eşitle
-        const ro = new (window as any).ResizeObserver((entries: any) => {
-          for (const entry of entries) {
-            const width = entry.contentRect?.width;
-            if (typeof width === 'number' && width > 0) {
-              setCameraBoxWidth(width);
-            }
-          }
-        });
-        try {
-          ro.observe(video);
-        } catch {}
-        // Temizlik
-        return () => {
-          try {
-            ro.disconnect();
-          } catch {}
-        };
       } catch (e) {
         console.warn('Video oynatma başlatılamadı');
       }
@@ -154,7 +135,7 @@ export default function PhotoPage() {
     img.src = current.image_url;
   }, [currentFrame, photoFrames]);
 
-  const displayAspectRatio = frameAspectRatio || videoAspectRatio || 3 / 4;
+  const displayAspectRatio = videoAspectRatio || frameAspectRatio || 3 / 4;
 
   const startPhotoTimer = () => {
     if (photoTimer === 0) {
@@ -326,11 +307,11 @@ export default function PhotoPage() {
           <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
               <div className="w-full h-full relative flex items-center justify-center">
-                <div className="relative max-w-full h-auto" style={{ width: cameraBoxWidth ? `${cameraBoxWidth}px` : undefined }}>
+                <div className="relative max-w-full max-h-full w-full" style={{ aspectRatio: displayAspectRatio }}>
                 <img 
                   src={previewImage} 
                   alt="Preview" 
-                    className="w-full h-auto object-contain rounded-lg"
+                    className="absolute inset-0 w-full h-full object-contain rounded-lg"
                 />
                   <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
                     {photoFrames[currentFrame]?.name || 'Çerçeve'}
@@ -340,16 +321,16 @@ export default function PhotoPage() {
             ) : cameraActive ? (
               <div className="w-full h-full relative flex items-center justify-center">
                 {/* Fixed inner wrapper so effects don't change outer frame size */}
-                <div className="relative max-w-full h-auto" style={{ width: cameraBoxWidth ? `${cameraBoxWidth}px` : undefined }}>
+                <div className="relative max-w-full max-h-full w-full" style={{ aspectRatio: displayAspectRatio }}>
                   {/* Camera box: constrain effects to this box only */}
-                  <div className="relative flex items-center justify-center overflow-hidden rounded-lg">
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg">
                     <video
                       id="camera-video"
                       ref={videoRef}
                       autoPlay
                       playsInline
                       muted
-                      className={cn("w-full h-auto object-contain rounded-lg transform-gpu")}
+                      className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
                       style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                     />
                     {photoFrames[currentFrame] && (
