@@ -304,7 +304,7 @@ export default function PhotoPage() {
 
         {/* Main Photo Area */}
         <Card className="mb-1 p-1.5 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-shrink min-h-0" style={{ flexBasis: '65%' }}>
-          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
               <div className="w-full h-full relative flex items-center justify-center">
                 <div className="relative max-w-full max-h-full w-full" style={{ aspectRatio: displayAspectRatio }}>
@@ -330,8 +330,8 @@ export default function PhotoPage() {
                       autoPlay
                       playsInline
                       muted
-                      className={cn("w-full h-full object-contain rounded-lg transform-gpu border-0 outline-none ring-0 shadow-none bg-transparent")}
-                      style={{ transform: isMirrored ? 'scaleX(-1)' : 'none', border: 'none', outline: 'none', boxShadow: 'none', background: 'transparent' }}
+                      className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
+                      style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                     />
                     {photoFrames[currentFrame] && (
                       <img
