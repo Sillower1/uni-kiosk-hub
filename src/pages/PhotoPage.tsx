@@ -290,32 +290,37 @@ export default function PhotoPage() {
               </div>
             ) : cameraActive ? (
               <div className="w-full h-full relative flex items-center justify-center">
-                <video
-                  id="camera-video"
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={cn("max-w-full max-h-full object-contain rounded-lg", isMirrored && "scale-x-[-1]")}
-                />
-                {photoFrames[currentFrame] && (
-                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                    <img
-                      src={photoFrames[currentFrame].image_url}
-                      alt="Frame overlay"
-                      className="max-w-full max-h-full object-contain rounded-lg opacity-50"
+                {/* Fixed inner wrapper so effects don't change outer frame size */}
+                <div className="relative w-full h-full max-w-full max-h-full">
+                  {/* Camera box: constrain effects to this box only */}
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg">
+                    <video
+                      id="camera-video"
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className={cn("w-full h-full object-contain rounded-lg transform-gpu")}
+                      style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                     />
+                    {photoFrames[currentFrame] && (
+                      <img
+                        src={photoFrames[currentFrame].image_url}
+                        alt="Frame overlay"
+                        className="pointer-events-none absolute inset-0 w-full h-full object-contain rounded-lg opacity-50"
+                      />
+                    )}
+                    {isCountingDown && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                        <div className="text-6xl font-bold text-white">
+                          {countdown}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                {isCountingDown && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
-                    <div className="text-6xl font-bold text-white">
-                      {countdown}
-                    </div>
+                  <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
+                    {photoFrames[currentFrame]?.name || 'Çerçeve'}
                   </div>
-                )}
-                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
-                  {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
               </div>
             ) : (
