@@ -267,15 +267,15 @@ export default function PhotoPage() {
     <div className="h-screen bg-gradient-to-br from-background via-secondary/20 to-background overflow-hidden flex flex-col p-2">
       <div className="max-w-6xl mx-auto w-full h-full flex flex-col">
         {/* Header */}
-        <div className="text-center mb-1.5 flex-shrink-0">
-          <h1 className="text-xl font-bold text-primary mb-0.5">Hatıra Fotoğrafı</h1>
-          <p className="text-xs text-muted-foreground">
+        <div className="text-center mb-1 flex-shrink-0">
+          <h1 className="text-lg font-bold text-primary mb-0.5">Hatıra Fotoğrafı</h1>
+          <p className="text-[10px] text-muted-foreground">
             Dokuz Eylül Üniversitesi YBS bölümünde özel anınızı ölümsüzleştirin
           </p>
         </div>
 
         {/* Main Photo Area */}
-        <Card className="mb-1.5 p-1.5 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-shrink min-h-0" style={{ flexBasis: '60%' }}>
+        <Card className="mb-1 p-1.5 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-shrink min-h-0" style={{ flexBasis: '65%' }}>
           <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
               <div className="w-full h-full relative flex items-center justify-center">
