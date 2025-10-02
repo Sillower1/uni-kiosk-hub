@@ -463,14 +463,6 @@ export default function PhotoPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center">Fotoğrafı Paylaş</DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-4 top-4"
-              onClick={() => setShowQR(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4 p-4">
             <p className="text-sm text-muted-foreground text-center">
