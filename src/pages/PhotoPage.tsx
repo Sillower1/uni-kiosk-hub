@@ -264,67 +264,67 @@ export default function PhotoPage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-background via-secondary/20 to-background overflow-hidden flex flex-col p-4">
+    <div className="h-screen bg-gradient-to-br from-background via-secondary/20 to-background overflow-hidden flex flex-col p-2">
       <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="text-center mb-3">
-          <h1 className="text-3xl font-bold text-primary mb-1">Hatıra Fotoğrafı</h1>
-          <p className="text-base text-muted-foreground">
+        <div className="text-center mb-2">
+          <h1 className="text-2xl font-bold text-primary mb-0.5">Hatıra Fotoğrafı</h1>
+          <p className="text-sm text-muted-foreground">
             Dokuz Eylül Üniversitesi YBS bölümünde özel anınızı ölümsüzleştirin
           </p>
         </div>
 
         {/* Main Photo Area */}
-        <Card className="mb-4 p-4 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-1 flex flex-col min-h-0">
-          <div className="w-full h-full max-w-3xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-2xl border-4 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
+        <Card className="mb-2 p-2 bg-gradient-to-br from-card to-secondary/10 shadow-lg flex-1 flex flex-col min-h-0">
+          <div className="w-full h-full max-w-4xl mx-auto bg-gradient-to-br from-muted/50 to-background rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden">
             {photoTaken && previewImage ? (
-              <div className="w-full h-full relative">
+              <div className="w-full h-full relative flex items-center justify-center">
                 <img 
                   src={previewImage} 
                   alt="Preview" 
-                  className="w-full h-full object-cover rounded-lg"
+                  className="max-w-full max-h-full object-contain rounded-lg"
                 />
-                <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
+                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
                   {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
               </div>
             ) : cameraActive ? (
-              <div className="w-full h-full relative">
+              <div className="w-full h-full relative flex items-center justify-center">
                 <video
                   id="camera-video"
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
-                  className={cn("w-full h-full object-cover rounded-lg", isMirrored && "scale-x-[-1]")}
+                  className={cn("max-w-full max-h-full object-contain rounded-lg", isMirrored && "scale-x-[-1]")}
                 />
                 {photoFrames[currentFrame] && (
-                  <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <img
                       src={photoFrames[currentFrame].image_url}
                       alt="Frame overlay"
-                      className="w-full h-full object-cover rounded-lg opacity-50"
+                      className="max-w-full max-h-full object-contain rounded-lg opacity-50"
                     />
                   </div>
                 )}
                 {isCountingDown && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
-                    <div className="text-8xl font-bold text-white">
+                    <div className="text-6xl font-bold text-white">
                       {countdown}
                     </div>
                   </div>
                 )}
-                <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
+                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
                   {photoFrames[currentFrame]?.name || 'Çerçeve'}
                 </div>
               </div>
             ) : (
               <div className="text-center">
-                <Camera className="w-24 h-24 text-muted-foreground/40 mx-auto mb-4" />
-                <p className="text-2xl text-muted-foreground">
+                <Camera className="w-16 h-16 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-xl text-muted-foreground">
                   Fotoğraf Önizleme Alanı
                 </p>
-                <p className="text-lg text-muted-foreground/60 mt-2">
+                <p className="text-sm text-muted-foreground/60 mt-1">
                   {photoFrames[currentFrame]?.name || 'Çerçeve seçili'} çerçevesi seçili
                 </p>
               </div>
@@ -333,28 +333,28 @@ export default function PhotoPage() {
         </Card>
 
         {/* Controls */}
-        <div className="flex flex-col items-center space-y-3">
+        <div className="flex flex-col items-center space-y-2">
           {/* Frame Selection */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <Button
               variant="outline"
               size="sm"
               onClick={prevFrame}
-              className="w-12 h-12 rounded-full p-0"
+              className="w-10 h-10 rounded-full p-0"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5" />
             </Button>
             
-            <div className="text-center min-w-[160px]">
-              <h3 className="text-xl font-semibold text-primary mb-1">
+            <div className="text-center min-w-[140px]">
+              <h3 className="text-lg font-semibold text-primary mb-0.5">
                 {photoFrames[currentFrame]?.name || 'Çerçeve Yok'}
               </h3>
-              <div className="flex justify-center space-x-2">
+              <div className="flex justify-center space-x-1.5">
                 {photoFrames.map((_, index) => (
                   <div
                     key={index}
                     className={cn(
-                      "w-3 h-3 rounded-full transition-all",
+                      "w-2 h-2 rounded-full transition-all",
                       index === currentFrame
                         ? "bg-primary scale-125"
                         : "bg-muted-foreground/30"
@@ -368,57 +368,57 @@ export default function PhotoPage() {
               variant="outline"
               size="sm"
               onClick={nextFrame}
-              className="w-12 h-12 rounded-full p-0"
+              className="w-10 h-10 rounded-full p-0"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             {!photoTaken ? (
               !cameraActive ? (
                 <Button
                   onClick={startCamera}
                   size="default"
-                  className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-lg px-8 py-5 rounded-xl shadow-lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-base px-6 py-4 rounded-xl shadow-lg"
                 >
-                  <Camera className="w-6 h-6 mr-2" />
+                  <Camera className="w-5 h-5 mr-2" />
                   Kamerayı Aç
                 </Button>
               ) : (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-1.5">
                   {/* Timer Selection */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Gecikme:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground">Gecikme:</span>
                     {[0, 3, 5, 10].map((seconds) => (
                       <Button
                         key={seconds}
                         variant={photoTimer === seconds ? "default" : "outline"}
                         size="sm"
                         onClick={() => setPhotoTimer(seconds)}
-                        className="w-12 h-8 text-sm"
+                        className="w-10 h-7 text-xs"
                       >
                         {seconds}s
                       </Button>
                     ))}
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <Button
                       onClick={startPhotoTimer}
                       disabled={isCountingDown}
                       size="default"
-                      className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-lg px-8 py-5 rounded-xl shadow-lg"
+                      className="bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-base px-6 py-4 rounded-xl shadow-lg"
                     >
-                      <Camera className="w-6 h-6 mr-2" />
+                      <Camera className="w-5 h-5 mr-2" />
                       {isCountingDown ? `${countdown}...` : photoTimer === 0 ? 'Fotoğraf Çek' : `${photoTimer}s Sonra Çek`}
                     </Button>
                     <Button
                       variant="outline"
                       size="default"
                       onClick={() => setIsMirrored((v) => !v)}
-                      className="text-base px-4 py-5"
+                      className="text-sm px-3 py-4"
                     >
                       {isMirrored ? 'Aynalamayı Kapat' : 'Aynala'}
                     </Button>
@@ -431,25 +431,25 @@ export default function PhotoPage() {
                   onClick={resetPhoto}
                   variant="outline"
                   size="default"
-                  className="text-base px-6 py-5"
+                  className="text-sm px-4 py-4"
                 >
                   Yeniden Çek
                 </Button>
                 <Button
                   onClick={savePhoto}
                   size="default"
-                  className="bg-accent hover:bg-accent-hover text-base px-6 py-5"
+                  className="bg-accent hover:bg-accent-hover text-sm px-4 py-4"
                 >
-                  <Download className="w-5 h-5 mr-2" />
+                  <Download className="w-4 h-4 mr-1.5" />
                   Kaydet
                 </Button>
                 <Button
                   onClick={saveAndSharePhoto}
                   size="default"
                   variant="outline"
-                  className="text-base px-6 py-5"
+                  className="text-sm px-4 py-4"
                 >
-                  <Share2 className="w-5 h-5 mr-2" />
+                  <Share2 className="w-4 h-4 mr-1.5" />
                   Kaydet ve Paylaş
                 </Button>
               </>
