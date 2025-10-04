@@ -179,6 +179,11 @@ export const ScheduleManager = () => {
                     id="course_name"
                     value={formData.course_name}
                     onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -188,6 +193,11 @@ export const ScheduleManager = () => {
                     id="course_code"
                     value={formData.course_code}
                     onChange={(e) => setFormData({ ...formData, course_code: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -199,6 +209,11 @@ export const ScheduleManager = () => {
                     id="instructor"
                     value={formData.instructor}
                     onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -260,6 +275,11 @@ export const ScheduleManager = () => {
                   id="room"
                   value={formData.room}
                   onChange={(e) => setFormData({ ...formData, room: e.target.value })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder="Örn: A-101"
                 />
               </div>

@@ -21,10 +21,9 @@ const quickActions = [
 ];
 
 const stats = [
-  { label: 'Aktif Öğrenci', value: '650+', icon: GraduationCap },
-  { label: 'Öğretim Üyesi', value: '23', icon: Users },
-  { label: 'Mezun Sayımız', value: '2000', icon: Clock },
-  { label: 'Kampüs Alanı', value: '2.5km²', icon: MapPin }
+  { label: 'Aktif Öğrenci', value: '600+', icon: GraduationCap },
+  { label: 'Öğretim Üyesi', value: '8', icon: Users },
+  { label: 'Mezun Sayımız', value: '800+', icon: Clock },
 ];
 
 export default function HomePage() {
@@ -118,21 +117,23 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold text-primary mb-8 text-center">
             Bölümümüz Hakkında
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow duration-200">
-                  <Icon className="w-12 h-12 text-accent mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </Card>
-              );
-            })}
+          <div className="flex justify-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
+              {stats.map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow duration-200">
+                    <Icon className="w-12 h-12 text-accent mx-auto mb-4" />
+                    <div className="text-3xl font-bold text-primary mb-2">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {stat.label}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </section>
 
