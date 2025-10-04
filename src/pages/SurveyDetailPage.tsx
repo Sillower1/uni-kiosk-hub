@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Keyboard } from "lucide-react";
 
 interface Question {
   id: string;
@@ -33,6 +33,7 @@ const SurveyDetailPage = () => {
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const textareaRefs = useRef<Record<number, HTMLTextAreaElement | null>>({});
 
   useEffect(() => {
     if (id) {
@@ -166,12 +167,33 @@ const SurveyDetailPage = () => {
 
       case "text":
         return (
-          <Textarea
-            value={value}
-            onChange={(e) => handleResponseChange(questionIndex, e.target.value)}
-            placeholder="Cevabınızı buraya yazın..."
-            className="min-h-[100px]"
-          />
+          <div className="flex gap-2">
+            <Textarea
+              ref={(el) => textareaRefs.current[questionIndex] = el}
+              value={value}
+              onChange={(e) => handleResponseChange(questionIndex, e.target.value)}
+              placeholder="Cevabınızı buraya yazın..."
+              className="min-h-[100px] flex-1"
+              inputMode="text"
+              autoComplete="off"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={(e) => {
+                e.preventDefault();
+                const textarea = textareaRefs.current[questionIndex];
+                if (textarea) {
+                  textarea.focus();
+                  textarea.click();
+                }
+              }}
+              className="shrink-0"
+            >
+              <Keyboard className="h-4 w-4" />
+            </Button>
+          </div>
         );
 
       default:
