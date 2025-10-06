@@ -367,6 +367,11 @@ export default function MapManager() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.stopPropagation();
+                    }
+                  }}
                   rows={3}
                 />
               </div>
