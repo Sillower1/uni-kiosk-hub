@@ -4,13 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Camera, 
   Megaphone, 
-  Map, 
   Calendar, 
   Users, 
-  ClipboardList,
   GraduationCap,
   Clock,
-  MapPin,
   Settings
 } from 'lucide-react';
 
@@ -137,31 +134,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section>
-          <h3 className="text-3xl font-bold text-primary mb-8 text-center">
-            Kiosk Özellikleri
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-              <Map className="w-12 h-12 text-accent mb-4" />
-              <h4 className="text-lg font-semibold text-primary mb-2">Kampüs Haritası</h4>
-              <p className="text-muted-foreground">Derslikler ve ofislerin konumlarını keşfedin</p>
-            </Card>
-            
-            <Card className="p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-              <Calendar className="w-12 h-12 text-accent mb-4" />
-              <h4 className="text-lg font-semibold text-primary mb-2">Ders Programları</h4>
-              <p className="text-muted-foreground">Haftalık ders programlarını görüntüleyin</p>
-            </Card>
-            
-            <Card className="p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-              <ClipboardList className="w-12 h-12 text-accent mb-4" />
-              <h4 className="text-lg font-semibold text-primary mb-2">Anket ve Geri Bildirim</h4>
-              <p className="text-muted-foreground">Görüşlerinizi bizimle paylaşın</p>
-            </Card>
-          </div>
-        </section>
       </div>
       
       {/* Admin Panel Access Button */}
