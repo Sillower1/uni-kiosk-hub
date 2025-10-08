@@ -81,6 +81,15 @@ export default function FrameManager() {
     setLoading(true);
 
     try {
+      // Mevcut kullanıcının kimlik doğrulamasını kontrol et
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        toast.error('Kimlik doğrulama hatası. Lütfen tekrar giriş yapın.');
+        setLoading(false);
+        return;
+      }
+
       let imageUrl = '';
 
       // Eğer yeni bir resim yüklendiyse
@@ -133,6 +142,7 @@ export default function FrameManager() {
         }
 
         frameData.image_url = imageUrl;
+        frameData.created_by = user.id; // Mevcut kullanıcının ID'sini ekle
 
         const { error } = await supabase
           .from('frames')
