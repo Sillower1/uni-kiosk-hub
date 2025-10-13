@@ -109,41 +109,34 @@ export default function SchedulePage() {
 
         {!loading && !error && (
           <>
-            {/* Class Filter */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl text-primary">
-                  <Filter className="w-6 h-6" />
-                  Sınıf Seçimi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-4 gap-4">
-                  {classYears.map((lvl) => (
-                    <Button
-                      key={lvl}
-                      variant={selectedClass === lvl ? 'kiosk' : 'outline'}
-                      size="xl"
-                      onClick={() => setSelectedClass(lvl)}
-                      className="h-20 flex flex-col items-center justify-center gap-2"
-                    >
-                      <GraduationCap className="w-8 h-8" />
-                      <span className="text-lg font-bold">{lvl}. Sınıf</span>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Schedule Table */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl text-primary">
-                  {selectedClass ?? '-'}. Sınıf Ders Programı
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Haftalık ders saatleri ve sınıf bilgileri
-                </p>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <CardTitle className="text-2xl text-primary mb-2">
+                      {selectedClass ?? '-'}. Sınıf Ders Programı
+                    </CardTitle>
+                    <p className="text-muted-foreground">
+                      Haftalık ders saatleri ve sınıf bilgileri
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-muted-foreground" />
+                    {classYears.map((lvl) => (
+                      <Button
+                        key={lvl}
+                        variant={selectedClass === lvl ? 'kiosk' : 'outline'}
+                        size="lg"
+                        onClick={() => setSelectedClass(lvl)}
+                        className="h-12 px-4 flex items-center justify-center gap-2"
+                      >
+                        <GraduationCap className="w-5 h-5" />
+                        <span className="text-sm font-bold">{lvl}. Sınıf</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {timeSlots.length === 0 ? (

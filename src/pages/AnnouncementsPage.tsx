@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Announcement {
   id: string;
@@ -15,6 +17,8 @@ export default function AnnouncementsPage() {
   const [items, setItems] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const [openId, setOpenId] = useState<string | null>(searchParams.get('id'));
 
   useEffect(() => {
     document.title = 'Duyurular - DEÜ YBS';
@@ -69,37 +73,44 @@ export default function AnnouncementsPage() {
         {/* Announcements Grid */}
         {!loading && !error && (
           items.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
               {items.map((a) => (
-                <Card key={a.id} className="relative transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-xl font-semibold text-primary pr-4">
-                        {a.title}
-                      </CardTitle>
-                    </div>
+                <Collapsible 
+                  key={a.id}
+                  open={openId === a.id}
+                  onOpenChange={(isOpen) => setOpenId(isOpen ? a.id : null)}
+                >
+                  <Card className="transition-all duration-200 hover:shadow-lg">
+                    <CollapsibleTrigger className="w-full text-left">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between mb-2">
+                          <CardTitle className="text-xl font-semibold text-primary pr-4">
+                            {a.title}
+                          </CardTitle>
+                        </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(a.created_at).toLocaleDateString('tr-TR')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{new Date(a.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                    </div>
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            <span>{new Date(a.created_at).toLocaleDateString('tr-TR')}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{new Date(a.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </CollapsibleTrigger>
 
-                    {/* Kategori/Acil bilgileri olmadığı için rozet kaldırıldı; ihtiyaç olursa eklenebilir */}
-                    <Badge className="hidden" />
-                  </CardHeader>
-
-                  <CardContent>
-                    <p className="text-foreground leading-relaxed">
-                      {a.content}
-                    </p>
-                  </CardContent>
-                </Card>
+                    <CollapsibleContent>
+                      <CardContent>
+                        <p className="text-foreground leading-relaxed">
+                          {a.content}
+                        </p>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
               ))}
             </div>
           ) : (
