@@ -89,6 +89,7 @@ export type Database = {
       faculty_members: {
         Row: {
           category: string | null
+          category_display_order: number | null
           contact_info: string | null
           created_at: string
           department: string
@@ -113,6 +114,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          category_display_order?: number | null
           contact_info?: string | null
           created_at?: string
           department: string
@@ -137,6 +139,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          category_display_order?: number | null
           contact_info?: string | null
           created_at?: string
           department?: string
@@ -397,16 +400,25 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           category: string
-          contact_info: string
+          category_display_order: number
           created_at: string
           department: string
           display_order: number
           education: string
+          education_display_order: number
+          email: string
+          email_display_order: number
           id: string
           image_url: string
+          linkedin: string
+          linkedin_display_order: number
           name: string
           office: string
+          office_display_order: number
+          phone: string
+          phone_display_order: number
           specialization: string
+          specialization_display_order: number
           title: string
           updated_at: string
         }[]
@@ -545,5 +557,5 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {},
-  },
-} as const
+  },
+} as const

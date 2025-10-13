@@ -255,7 +255,7 @@ export const FacultyManager = () => {
       // Update all faculty members in this category
       const { error } = await supabase
         .from("faculty_members")
-        .update({ category_display_order: newOrder })
+        .update({ display_order: newOrder })
         .eq("category", categoryName);
 
       if (error) throw error;
@@ -263,7 +263,7 @@ export const FacultyManager = () => {
       // Update local state
       setFacultyMembers(prevMembers =>
         prevMembers.map(member =>
-          member.category === categoryName ? { ...member, category_display_order: newOrder } : member
+          member.category === categoryName ? { ...member, display_order: newOrder } : member
         )
       );
 
